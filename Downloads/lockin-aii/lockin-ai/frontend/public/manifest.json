@@ -1,0 +1,9 @@
+{
+  "short_name": "LockIn AI",
+  "name": "LockIn AI - Interview Copilot",
+  "icons": [],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#0a0b0d",
+  "background_color": "#0a0b0d"
+}

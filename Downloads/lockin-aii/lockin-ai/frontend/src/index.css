@@ -1,0 +1,108 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;600&family=Geist:wght@300;400;500;600;700&display=swap');
+
+html, body, #root {
+    height: 100%;
+    background: #0a0b0d;
+}
+
+body {
+    margin: 0;
+    font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    color: #e6e7ea;
+}
+
+.font-serif-hero { font-family: 'Instrument Serif', serif; letter-spacing: -0.01em; }
+.font-mono-ui { font-family: 'JetBrains Mono', monospace; }
+
+@layer base {
+    :root {
+        --background: 220 10% 5%;
+        --foreground: 220 10% 92%;
+        --card: 220 10% 8%;
+        --card-foreground: 220 10% 92%;
+        --popover: 220 10% 7%;
+        --popover-foreground: 220 10% 92%;
+        --primary: 150 84% 55%;
+        --primary-foreground: 220 10% 5%;
+        --secondary: 220 10% 12%;
+        --secondary-foreground: 220 10% 92%;
+        --muted: 220 10% 12%;
+        --muted-foreground: 220 8% 60%;
+        --accent: 220 10% 14%;
+        --accent-foreground: 220 10% 92%;
+        --destructive: 0 72% 55%;
+        --destructive-foreground: 0 0% 98%;
+        --border: 220 10% 15%;
+        --input: 220 10% 14%;
+        --ring: 150 84% 55%;
+        --radius: 0.75rem;
+    }
+}
+
+@layer base {
+    * { @apply border-border; }
+    body { @apply bg-background text-foreground; }
+}
+
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: #0a0b0d; }
+::-webkit-scrollbar-thumb { background: #23262c; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #2d3138; }
+
+::selection { background: rgba(34, 197, 94, 0.35); color: #eafff2; }
+
+.grid-bg {
+    background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size: 44px 44px;
+}
+
+.noise::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.035;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.glow-green { box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.25), 0 8px 32px -8px rgba(34, 197, 94, 0.35); }
+
+.card-hover { transition: border-color 200ms ease, transform 200ms ease, background 200ms ease; }
+.card-hover:hover { border-color: rgba(34, 197, 94, 0.4); transform: translateY(-2px); }
+
+.stealth-overlay {
+    background: rgba(10, 11, 13, 0.72);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 24px 80px -20px rgba(0,0,0,0.6), 0 0 0 1px rgba(34,197,94,0.12);
+}
+
+.pulse-dot {
+    width: 8px; height: 8px; border-radius: 999px; background: #22c55e;
+    box-shadow: 0 0 0 0 rgba(34,197,94,0.7);
+    animation: pulse 1.6s infinite;
+}
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(34,197,94,0.6); }
+    70% { box-shadow: 0 0 0 10px rgba(34,197,94,0); }
+    100% { box-shadow: 0 0 0 0 rgba(34,197,94,0); }
+}
+
+.kbd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: #b8bcc4;
+}
