@@ -27,9 +27,8 @@ export async function geminiGenerate({ apiKey, model = 'gemini-flash-lite-latest
   return text;
 }
 
-export async function analyzeResume({ apiKey, model, text, notes }) {
+export async function analyzeResume({ apiKey, model, text }) {
   const system = `You are an expert technical recruiter and interview coach. Return ONLY valid JSON.`;
-  const notesBlock = notes?.trim() ? `\n\nCANDIDATE'S OWN PROJECT NOTES (use these for extra depth — specific implementation details, decisions, metrics the candidate wants to be able to speak to):\n${notes.trim().slice(0, 6000)}` : '';
   const prompt = `Analyze this resume and return JSON with this exact shape:
 {
   "role": "most likely target role (short)",
@@ -42,10 +41,9 @@ export async function analyzeResume({ apiKey, model, text, notes }) {
     ...exactly 8 questions tailored to this resume
   ]
 }
-If project notes are provided below, weave in 2-3 questions that specifically probe the details in those notes (implementation choices, trade-offs, metrics).
 
 RESUME TEXT:
-${text.slice(0, 12000)}${notesBlock}`;
+${text.slice(0, 12000)}`;
   const raw = await geminiGenerate({ apiKey, model, prompt, system, json: true });
   try { return JSON.parse(raw); }
   catch {
@@ -55,20 +53,12 @@ ${text.slice(0, 12000)}${notesBlock}`;
   }
 }
 
-export async function whisperAnswer({ apiKey, model, question, prefs, resumeContext, notes }) {
+export async function whisperAnswer({ apiKey, model, question, prefs, resumeContext }) {
   const lenRule = prefs?.answerLength === 'auto'
     ? 'Choose the ideal length (1–5 lines) based on the question complexity.'
     : `Answer in EXACTLY ${prefs.answerLength} line(s).`;
   const system = `You are a real-time interview whisper assistant. Deliver the sharpest possible answer as if the candidate is speaking. Confident, structured, no filler. ${lenRule}`;
-  const ctx = resumeContext ? `\n\nCANDIDATE RESUME CONTEXT:\n${resumeContext.slice(0, 1500)}` : '';
-  const notesCtx = notes?.trim() ? `\n\nCANDIDATE'S OWN PROJECT NOTES (prefer these specifics when relevant — real numbers, architecture decisions, things only the candidate would know):\n${notes.trim().slice(0, 3000)}` : '';
-  const prompt = `Interview question: "${question}"${ctx}${notesCtx}\n\nAnswer now.`;
-  return await geminiGenerate({ apiKey, model, prompt, system });
-}
-
-export async function codingAnswer({ apiKey, model, question, language }) {
-  const system = `You are an expert coding interview coach. Explain clearly, teach the approach, don't just dump code.`;
-  const langLine = language ? `Preferred language: ${language}.` : 'Pick the most idiomatic language for the problem (mention which you chose).';
-  const prompt = `Coding interview question:\n"${question}"\n\n${langLine}\n\nRespond with:\n1. Approach — brief plan in plain English (2-4 sentences)\n2. Time & space complexity\n3. Full working solution in a code block\n4. One key edge case to mention out loud in a real interview`;
+  const ctx = resumeContext ? `\n\nCANDIDATE CONTEXT:\n${resumeContext.slice(0, 1500)}` : '';
+  const prompt = `Interview question: "${question}"${ctx}\n\nAnswer now.`;
   return await geminiGenerate({ apiKey, model, prompt, system });
 }

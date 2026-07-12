@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 const MODULES = [
   { id: 'resume', to: '/resume', title: 'Resume Analysis', desc: 'Upload PDF/DOCX/TXT — extract skills, get tailored questions.', icon: FileText, tag: 'AI', color: 'emerald' },
-  { id: 'mock', to: '/mock', title: 'Start Interview', desc: 'Timed practice with per-question scoring & feedback.', icon: Timer, tag: 'Timed', color: 'amber' },
+  { id: 'mock', to: '/mock', title: 'Mock Interview', desc: 'Timed practice with per-question scoring & feedback.', icon: Timer, tag: 'Timed', color: 'amber' },
   { id: 'coding', to: '/coding', title: 'Coding Interview', desc: 'DSA problems with reference solutions & complexity.', icon: Code2, tag: 'Q&A', color: 'sky' },
   { id: 'research', to: '/research', title: 'Company Research', desc: 'Live web search for company news, culture, and role context.', icon: Building2, tag: 'Live', color: 'violet' },
   { id: 'files', to: '/files', title: 'File Study Kit', desc: 'Summarise + auto-generate questions from any document.', icon: BookOpenText, tag: 'Study', color: 'rose' },
@@ -62,7 +62,7 @@ export default function Dashboard() {
       <div className="flex flex-wrap items-center gap-3 mb-10">
         <button onClick={toggle} data-testid="dashboard-start-mock-btn"
           className="px-5 py-2.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-[13px] font-medium flex items-center gap-2 transition-colors">
-          <Timer className="w-4 h-4" /> Start Interview
+          <Timer className="w-4 h-4" /> Start Mock Interview
         </button>
         <button onClick={toggle} data-testid="dashboard-stealth-btn"
           className="px-5 py-2.5 rounded-full border border-white/15 hover:border-emerald-500/50 hover:text-emerald-300 text-white/85 text-[13px] font-medium flex items-center gap-2 transition-colors">

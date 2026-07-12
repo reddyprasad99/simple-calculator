@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Upload, FileText, Loader2, Sparkles, RefreshCcw, Trash2, StickyNote } from 'lucide-react';
+import { Upload, FileText, Loader2, Sparkles, RefreshCcw, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { parseFile } from '@/lib/fileParser';
 import { analyzeResume } from '@/lib/gemini';
-import { getKeys, getPrefs, getResume, setResume, getAnalysis, setAnalysis, pushHistory, getNotes, setNotes } from '@/lib/storage';
+import { getKeys, getPrefs, getResume, setResume, getAnalysis, setAnalysis, pushHistory } from '@/lib/storage';
 
 const MAX = 10 * 1024 * 1024;
 
@@ -11,22 +11,13 @@ export default function Resume() {
   const inputRef = useRef(null);
   const [resume, setLocalResume] = useState(null);
   const [analysis, setLocalAnalysis] = useState(null);
-  const [notes, setLocalNotes] = useState('');
-  const [notesSaved, setNotesSaved] = useState(true);
   const [busy, setBusy] = useState('');
   const [drag, setDrag] = useState(false);
 
   useEffect(() => {
     setLocalResume(getResume());
     setLocalAnalysis(getAnalysis());
-    setLocalNotes(getNotes());
   }, []);
-
-  const saveNotes = () => {
-    setNotes(notes);
-    setNotesSaved(true);
-    toast.success('Notes saved');
-  };
 
   const runAnalysis = async (text) => {
     const keys = getKeys();
@@ -34,7 +25,7 @@ export default function Resume() {
     setBusy('analyze');
     try {
       const prefs = getPrefs();
-      const out = await analyzeResume({ apiKey: keys.gemini, model: prefs.model, text, notes: getNotes() });
+      const out = await analyzeResume({ apiKey: keys.gemini, model: prefs.model, text });
       setAnalysis(out); setLocalAnalysis(out);
       pushHistory({ type: 'resume-analysis', role: out.role });
       toast.success('Analysis ready');
@@ -85,28 +76,6 @@ export default function Resume() {
             <Trash2 className="w-3.5 h-3.5" /> Clear
           </button>
         )}
-      </div>
-
-      <div className="rounded-xl border border-white/10 bg-white/[0.02] p-5 mb-6" data-testid="notes-panel">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-2">
-            <StickyNote className="w-4 h-4 text-emerald-400" />
-            <div className="text-[10px] uppercase tracking-wider text-white/40 font-mono-ui">Your Project Notes</div>
-          </div>
-          <button onClick={saveNotes} disabled={notesSaved} data-testid="notes-save-btn"
-            className="text-[11.5px] px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 disabled:opacity-40 disabled:cursor-default hover:bg-emerald-500/25">
-            {notesSaved ? 'Saved' : 'Save notes'}
-          </button>
-        </div>
-        <textarea
-          value={notes}
-          onChange={(e) => { setLocalNotes(e.target.value); setNotesSaved(false); }}
-          data-testid="notes-textarea"
-          placeholder="Add specifics only you'd know — architecture decisions, metrics, what you'd do differently, tricky bugs you solved. Analysis and Whisper answers will use these for extra depth."
-          rows={4}
-          className="w-full bg-black/20 border border-white/10 rounded-lg px-3.5 py-2.5 text-[13px] text-white/90 outline-none focus:border-emerald-500/40 placeholder:text-white/25 resize-y"
-        />
-        <div className="text-[11px] text-white/35 mt-2">Stored locally in your browser, same as your resume — never sent anywhere except with your own analysis/answer requests.</div>
       </div>
 
       {!resume && (

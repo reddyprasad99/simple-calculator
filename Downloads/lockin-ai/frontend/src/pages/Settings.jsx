@@ -67,11 +67,16 @@ export default function Settings() {
           <h2 className="text-[15px] font-medium">Preferences</h2>
         </div>
 
-        <Label>Voice input (Whisper tab)</Label>
-        <div className="mb-6">
-          <div className="rounded-lg border border-white/10 bg-black/20 p-4 text-[12.5px] text-white/60 leading-relaxed">
-            Click the mic button in the Whisper panel to dictate a question with your own voice instead of typing it — useful when practicing solo and reading a question out loud. This only ever captures your own microphone, never system or call audio.
-          </div>
+        <Label>Voice recognition mode</Label>
+        <div className="grid grid-cols-2 gap-3 mb-6">
+          <RadioTile active={prefs.voiceMode === 'interviewer'}
+            onClick={() => setLocalPrefs(p => ({ ...p, voiceMode: 'interviewer' }))}
+            title="Interviewer only"
+            desc="Listen to the interviewer's audio (system/playback), whisper as candidate." />
+          <RadioTile active={prefs.voiceMode === 'both'}
+            onClick={() => setLocalPrefs(p => ({ ...p, voiceMode: 'both' }))}
+            title="Interviewer + Student"
+            desc="Capture both voices for full transcript & smarter follow-ups." />
         </div>
 
         <Label>Answer length (lines)</Label>
