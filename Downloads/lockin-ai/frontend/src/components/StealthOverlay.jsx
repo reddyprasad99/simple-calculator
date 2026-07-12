@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStealth } from '@/components/StealthProvider';
-import { X, Sparkles, Send, Loader2, Minimize2 } from 'lucide-react';
-import { getKeys, getPrefs, getResume } from '@/lib/storage';
+import { X, Sparkles, Send, Loader2, Minimize2, Mic, MicOff } from 'lucide-react';
+import { getKeys, getPrefs, getResume, getNotes } from '@/lib/storage';
 import { whisperAnswer } from '@/lib/gemini';
 import { toast } from 'sonner';
+
+const SpeechRecognitionAPI = typeof window !== 'undefined'
+  ? (window.SpeechRecognition || window.webkitSpeechRecognition)
+  : null;
 
 export default function StealthOverlay() {
   const { open, setOpen } = useStealth();
@@ -13,8 +17,58 @@ export default function StealthOverlay() {
   const [answer, setAnswer] = useState('');
   const [thinking, setThinking] = useState(false);
   const [min, setMin] = useState(false);
+  const [listening, setListening] = useState(false);
   const dragRef = useRef(null);
   const dragging = useRef(null);
+  const recogRef = useRef(null);
+  const baseTextRef = useRef('');
+
+  useEffect(() => {
+    if (!SpeechRecognitionAPI) return;
+    const rec = new SpeechRecognitionAPI();
+    rec.continuous = true;
+    rec.interimResults = true;
+    rec.lang = 'en-US';
+    rec.onresult = (e) => {
+      let finalText = '';
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t;
+        else interim += t;
+      }
+      if (finalText) baseTextRef.current = (baseTextRef.current + ' ' + finalText).trim();
+      setQuestion((baseTextRef.current + ' ' + interim).trim());
+    };
+    rec.onerror = (e) => {
+      if (e.error === 'not-allowed' || e.error === 'service-not-allowed') {
+        toast.error('Microphone permission denied — allow mic access in your browser.');
+      }
+      setListening(false);
+    };
+    rec.onend = () => setListening(false);
+    recogRef.current = rec;
+    return () => { try { rec.stop(); } catch {} };
+  }, []);
+
+  const toggleMic = () => {
+    if (!SpeechRecognitionAPI) {
+      toast.error('Voice input not supported in this browser — try Chrome or Edge.');
+      return;
+    }
+    if (listening) {
+      recogRef.current?.stop();
+      setListening(false);
+    } else {
+      baseTextRef.current = question;
+      try {
+        recogRef.current?.start();
+        setListening(true);
+      } catch {
+        toast.error('Could not start microphone.');
+      }
+    }
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -52,6 +106,7 @@ export default function StealthOverlay() {
         question: question.trim(),
         prefs,
         resumeContext: resume?.text,
+        notes: getNotes(),
       });
       setAnswer(out);
     } catch (e) {
@@ -117,10 +172,15 @@ export default function StealthOverlay() {
           </div>
 
           <div className="h-12 px-4 flex items-center justify-between border-t border-white/5">
-            <div className="text-[11px] text-white/40 flex items-center gap-2">
-              <div className="w-1.5 h-1.5 rounded-full bg-white/30" />
-              <span>Listen <span className="text-white/25">(Phase 2)</span></span>
-            </div>
+            <button onClick={toggleMic} data-testid="overlay-mic-btn"
+              className={`text-[11px] flex items-center gap-2 px-2.5 py-1.5 rounded-full border transition-colors ${
+                listening
+                  ? 'border-rose-500/40 bg-rose-500/10 text-rose-300'
+                  : 'border-white/10 text-white/40 hover:text-white/70 hover:border-white/25'
+              }`}>
+              {listening ? <Mic className="w-3 h-3 animate-pulse" /> : <MicOff className="w-3 h-3" />}
+              <span>{listening ? 'Listening…' : 'Voice input'}</span>
+            </button>
             <button onClick={suggest} disabled={thinking} data-testid="overlay-suggest-btn"
               className="px-4 py-1.5 rounded-full bg-emerald-500 hover:bg-emerald-400 text-black text-[12px] font-medium flex items-center gap-2 disabled:opacity-50">
               <Send className="w-3 h-3" /> Suggest

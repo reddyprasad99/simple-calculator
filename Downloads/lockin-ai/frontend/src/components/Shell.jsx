@@ -5,7 +5,7 @@ import { useStealth } from '@/components/StealthProvider';
 const NAV = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
   { to: '/resume', label: 'Resume', icon: FileText },
-  { to: '/mock', label: 'Mock', icon: Timer },
+  { to: '/mock', label: 'Start Interview', icon: Timer },
   { to: '/coding', label: 'Coding', icon: Code2 },
   { to: '/files', label: 'Files', icon: BookOpenText },
   { to: '/research', label: 'Research', icon: Building2 },
